@@ -2,9 +2,15 @@ var cheerio = require('cheerio');
 var request = require('request');
 
 function scrape() {
-    request(YOUR_URL, function(error, response, html) {
+    request('http://www.producthunt.com/', function(error, response, html) {
         var $ = cheerio.load(html);
 
+        var titles = $('a').map(function(index,element) {
+            return [element.attribs.title];
+        }).filter(function(index, element) {
+            return element;
+        });
+        console.log(titles);
     });
 }
 
