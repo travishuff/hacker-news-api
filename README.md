@@ -1,7 +1,3 @@
-- Parses page when sent
-- Move to CRON job, store data in mongo database
-- send the data as json
-
 #Node-API
 
 ##Summary
@@ -10,12 +6,15 @@ Node-API is the beginning of an incredible project - you will be constructing an
   Scrape data
 - Unit 10: Angular
   Create a launch page for your API. This page will contain a home page, documentation page, and a guide to get started
+- Unit 11: Authentication
+  Users can login and logout
 - Unit 11: Database
   Store user account information
-- Unit 12: Authentication
-  Store
 
-In this challenge, you will be working with a module called [cheerio](https://github.com/cheeriojs/cheerio). Cheerio allows users to interact with pages on the server similar to the way they interact with the DOM with jQuery.
+
+In this challenge, we will scrape data from a website, parsing the content. A user should be able to make a GET request to one of your routes, and your server should respond with the data you scraped.
+
+We will be working with a module called [cheerio](https://github.com/cheeriojs/cheerio). Cheerio allows users to interact with pages on the server similar to the way they interact with the DOM using jQuery.
 
 ##How do I get started?
 1. Run ```npm install``` in your terminal to install external dependencies.
