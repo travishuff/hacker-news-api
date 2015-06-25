@@ -14,7 +14,7 @@ Node-API is the beginning of an incredible project - you will be constructing an
 
 In this challenge, we will scrape data from a website, parsing the content. A user should be able to make a GET request to one of your routes, and your server should respond with the data you scraped.
 
-We will be working with a module called [cheerio](https://github.com/cheeriojs/cheerio). Cheerio allows users to interact with pages on the server similar to the way they interact with the DOM using jQuery.
+We will be working with a module called [cheerio](https://github.com/cheeriojs/cheerio). Cheerio allows developers to interact with pages on the server similar to the way they interact with the DOM using jQuery.
 
 ##How do I get started?
 1. Run ```npm install``` in your terminal to install external dependencies.
