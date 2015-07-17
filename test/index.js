@@ -33,4 +33,10 @@ describe('Unit 9 Node API', function() {
     expect(router_counter).to.be.at.least(2);
   });
 
+  it('should allows cross origin resource sharing (look up Access-Control-Allow-Origin)', function(){
+    request
+      .get('/')
+      .expect('Access-Control-Allow-Origin', '*')
+      .end(done);
+  });
 });
