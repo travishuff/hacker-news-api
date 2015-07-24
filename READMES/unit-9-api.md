@@ -1,14 +1,26 @@
 # Unit 9 building an API
 
+##Summary
+Node-API is the beginning of an incredible project - you will be constructing an API from scratch. This section will be broken down into these components:
+- Unit 9 : Node-API
+  Scrape data
+- Unit 10: Angular
+  Create a launch page for your API. This page will contain a home page, documentation page, and a guide to get started
+- Unit 11: Authentication
+  Users can login and logout
+- Unit 11: Database
+  Store user account information
+
+
+In this challenge, we will scrape data from a website, parsing the content. A user should be able to make a GET request to one of your routes, and your server should respond with the data you scraped.
+
 ## APIs
 
 >We're entering a new world in which data may be more important than software -Tim O'Reilly
 
-
 Creating JSON apis allows us to do something really awesome. We can separate how our data is **created** and sent out from how it is **displayed** and used. 
 
 Figuring out how to send out json data in response to HTTP requests is a crucial part of modern web applications. Everything from twitter, to etsy to pinterest use internal apis to release their content. 
-
 
 This means that you can use react to display your JSON data one day, and then a year from now switch to something else without having to refactor your **server-side** code. After all, its just JSON data.
 
