@@ -1,14 +1,14 @@
-# Unit 9 building an API
+# Unit 8 building an API
 
 ##Summary
 Node-API is the beginning of an incredible project - you will be constructing an API from scratch. This section will be broken down into these components:
-- Unit 9 : Node-API
+- Unit 8 : Node-API
   Scrape data
-- Unit 10: Angular
+- Unit 9: Angular
   Create a launch page for your API. This page will contain a home page, documentation page, and a guide to get started
-- Unit 11: Authentication
+- Unit 10: Authentication
   Users can login and logout
-- Unit 11: Database
+- Unit 10: Database
   Store user account information
 
 
@@ -38,10 +38,22 @@ We are going to use a module called [cheerio](https://github.com/cheeriojs/cheer
 
 ##Getting started
 
-1. Figure out with your partner what site you want to scrape/what date you want to return.
-1. Run npm install in your terminal to install external dependencies.
-1. Complete the assignment in server/scraper.js.
-1. To start your server run npm start.
+- Set Up
+  - [ ] Figure out with your partner what site you want to scrape/what data you want to return.
+  - [ ] Run npm install in your terminal to install external dependencies.
+- Basic API (use `npm test` to test your solutions for this section)
+  - [ ] Add a root route `/` to your Express server so that your server responds to requests to `http://localhost:3000/`
+  - [ ] Configure your server to respond with Content-Type JSON for requests to the `/` route
+  - [ ] Add at least two total endpoints to your server
+  - [ ] Allow [Cross-Origin-Resource-Sharing](http://enable-cors.org/) on your server in order to allow your API to respond to requests from anywhere, not just from your own computer
+- Advanced API: Scraping
+  - [ ] When a request to one of your endpoints comes in, have your server retrieve HTML from another site (you can build upon the starting code provided in `scraper.js`)
+  - [ ] After retrieving the HTML, use Cheerio to navigate through the HTML and pick out the bits of information that you want for your API, then bundle that information into a JavaScript object
+  - [ ] Have your server respond to requests to your endpoint with your newly created object
+  - [ ] Have your second endpoint scrape a different site and respond with a JSON formatted response just like the previous endpoint
+- Scraping Pt. 2
+  - [ ] Sometimes it's necessary to follow a link when scraping in order to gather more information from the new location. Modify one of your endpoints to follow at least one URL from the original page it's scraping, and then scrape that page as well. Make sure you fully populate your results object before sending your response (remember: Node HTTP requests are asynchronous - use your callbacks!)
+  - [ ] You might notice that as your scraper follows other URLs to new locations, its speed drastically decreases with each new HTTP request it must wait for. Implement server-side caching for your routes so that a request sent within 5 minutes of a previous request to the same route will be responded to with the cached content from the first request.
 
 ###Bonus
 
