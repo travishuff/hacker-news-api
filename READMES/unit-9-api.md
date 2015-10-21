@@ -35,6 +35,14 @@ The best APIs have great documentation and often have a simple but compelling la
 
 A user should be able to make a GET request to one of your routes (endpoints), and your server should respond with the data you scraped.
 
+###How are we going to scrape webpages?
+
+In this challenge, we're going to be scraping an external site, parsing their html, converting it into JSON and making that JSON data available at an 'endpoint' (a route)
+
+We are going to use a module in node called [cheerio](https://github.com/cheeriojs/cheerio) to help us do this. Node gives us access to lots of free pre-written code for us (packages) through a service known as [npm](http://npmjs.com). We can install these packages for our project [Installing npm packages locally](https://docs.npmjs.com/getting-started/installing-npm-packages-locally)
+
+[Cheerio](https://github.com/cheeriojs/cheerio) is an npm packages that allows developers to interact with pages on the server similar to the way they interact with the DOM using jQuery
+
 ---
 
 ## Things to look out for
@@ -45,30 +53,27 @@ A user should be able to make a GET request to one of your routes (endpoints), a
 
 ---
 
-In this challenge, we're going to be scraping an external site, parsing their html, converting it into JSON and making that JSON data available at an 'endpoint' (a route)
-
-We are going to use a module in node called [cheerio](https://github.com/cheeriojs/cheerio) to help us do this. Node gives us access to lots of free pre-written code for us (packages) through a service known as [npm](http://npmjs.com). We can install these packages for our project [Installing npm packages locally](https://docs.npmjs.com/getting-started/installing-npm-packages-locally)
-
-[Cheerio](https://github.com/cheeriojs/cheerio) is an npm packages that allows developers to interact with pages on the server similar to the way they interact with the DOM using jQuery
-
 ##Getting started
 
-- Set Up
-  - [ ] Figure out with your partner what site you want to scrape/what data you want to return.
-  - [ ] Run npm install in your terminal to install external dependencies.
-- Basic API (use `npm test` to test your solutions for this section) You may also visit your route in your browser. The browser sends an http GET request to your route. Your server should respond.
-  - [ ] Add a root route `/` to your Express server so that your server responds to requests to `http://localhost:3000/`
-  - [ ] Configure your server to respond with Content-Type JSON for requests to the `/` route
-  - [ ] Add at least two total endpoints to your server
-  - [ ] Allow [Cross-Origin-Resource-Sharing](http://enable-cors.org/) on your server in order to allow your API to respond to requests from anywhere, not just from your own computer
-- Advanced API: Scraping
-  - [ ] When a request to one of your endpoints comes in, have your server retrieve HTML from another site (you can build upon the starting code provided in `scraper.js`)
-  - [ ] After retrieving the HTML, use Cheerio to navigate through the HTML and pick out the bits of information that you want for your API, then bundle that information into a JavaScript object
-  - [ ] Have your server respond to requests to your endpoint with your newly created object
-  - [ ] Have your second endpoint scrape a different site and respond with a JSON formatted response just like the previous endpoint
-- Scraping Pt. 2
-  - [ ] Sometimes it's necessary to follow a link when scraping in order to gather more information from the new location. Modify one of your endpoints to follow at least one URL from the original page it's scraping, and then scrape that page as well. Make sure you fully populate your results object before sending your response (remember: Node HTTP requests are asynchronous - use your callbacks!)
-  - [ ] You might notice that as your scraper follows other URLs to new locations, its speed drastically decreases with each new HTTP request it must wait for. Implement server-side caching for your routes so that a request sent within 5 minutes of a previous request to the same route will be responded to with the cached content from the first request.
+Set Up
+- [ ] Figure out with your partner what site you want to scrape/what data you want to return.
+- [ ] Run npm install in your terminal to install external dependencies.
+
+Basic API (use `npm test` to test your solutions for this section) You may also visit your route in your browser. The browser sends an http GET request to your route. Your server should respond.
+- [ ] Add a root route `/` to your Express server so that your server responds to requests to `http://localhost:3000/`
+- [ ] Configure your server to respond with Content-Type JSON for requests to the `/` route
+- [ ] Add at least two total endpoints to your server
+- [ ] Allow [Cross-Origin-Resource-Sharing](http://enable-cors.org/) on your server in order to allow your API to respond to requests from anywhere, not just from your own computer
+
+Advanced API: Scraping
+- [ ] When a request to one of your endpoints comes in, have your server retrieve HTML from another site (you can build upon the starting code provided in `scraper.js`)
+- [ ] After retrieving the HTML, use Cheerio to navigate through the HTML and pick out the bits of information that you want for your API, then bundle that information into a JavaScript object
+- [ ] Have your server respond to requests to your endpoint with your newly created object
+- [ ] Have your second endpoint scrape a different site and respond with a JSON formatted response just like the previous endpoint
+
+Scraping Pt. 2
+- [ ] Sometimes it's necessary to follow a link when scraping in order to gather more information from the new location. Modify one of your endpoints to follow at least one URL from the original page it's scraping, and then scrape that page as well. Make sure you fully populate your results object before sending your response (remember: Node HTTP requests are asynchronous - use your callbacks!)
+- [ ] You might notice that as your scraper follows other URLs to new locations, its speed drastically decreases with each new HTTP request it must wait for. Implement server-side caching for your routes so that a request sent within 5 minutes of a previous request to the same route will be responded to with the cached content from the first request.
 
 ###Bonus
 
