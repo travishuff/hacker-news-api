@@ -2,7 +2,18 @@
 
 ##Summary
 
-In this unit you will be constructing an API from scratch by 'scraping' a website page's data and making it easily accessible at a 'route' for other develoeprs
+In this unit you will be constructing an API from scratch by 'scraping' a website page's data and making it easily accessible at a 'route' for other developers
+
+---
+
+## Learning Goals
+
+* Learning what a server is and does
+* Understand what an API is and how to build one
+* Learn how to find the data you need and properly scrape a website
+* Understand the importance of good documentation to encourage developers to use your API
+
+---
 
 ###What is an API?
 
@@ -25,13 +36,6 @@ The best APIs have great documentation and often have a simple but compelling la
 A user should be able to make a GET request to one of your routes (endpoints), and your server should respond with the data you scraped.
 
 ---
-
-## Learning Goals
-
-* Learning what a server is and does
-* Understand what an API is and how to build one
-* Learn how to find the data you need and properly scrape a website
-* Understand the importance of good documentation to encourage developers to use your API
 
 ## Things to look out for
 
