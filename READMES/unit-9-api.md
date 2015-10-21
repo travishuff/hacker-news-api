@@ -1,47 +1,58 @@
-# Unit 8 building an API
+# Unit 8 - Building an API in Node
 
 ##Summary
-Node-API is the beginning of an incredible project - you will be constructing an API from scratch. This section will be broken down into these components:
-- Unit 8 : Node-API
-  Scrape data
-- Unit 9: Angular
-  Create a launch page for your API. This page will contain a home page, documentation page, and a guide to get started
-- Unit 10: Authentication
-  Users can login and logout
-- Unit 10: Database
-  Store user account information
 
+In this unit you will be constructing an API from scratch by 'scraping' a website page's data and making it easily accessible at a 'route' for other develoeprs
 
-In this challenge, we will scrape data from a website, parsing the content. A user should be able to make a GET request to one of your routes, and your server should respond with the data you scraped.
+###What is an API?
 
-## APIs
+For our purposes an API can be thought of as a destination that we or other developers can go to and get data from in a standardised way. 
 
->We're entering a new world in which data may be more important than software -Tim O'Reilly
+For example, *without an API*, if I wanted to get the latest weather from Weather.com I would go to Weather.com and worry about how the layout or formatting has changed if I want to grab the latest 7 days' weather. 
 
-Creating JSON apis allows us to do something really awesome. We can separate how our data is **created** and sent out from how it is **displayed** and used. 
+Now if Weather.com has made their weather information available as an 'API', I can go to the right address, e.g. weather.com/api?los-angeles&last-7-days and I will always get back a nice tidy set of data with the last 7 days of weather from Los Angeles.
 
-Figuring out how to send out json data in response to HTTP requests is a crucial part of modern web applications. Everything from twitter, to etsy to pinterest use internal apis to release their content. 
+Even better, that data is stored in a common format, that is easy to use and manipulate in JavaScript, known as JSON - [MDN - JSON](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/JSON)
 
-This means that you can use react to display your JSON data one day, and then a year from now switch to something else without having to refactor your **server-side** code. After all, its just JSON data.
+###What are we doing with our API?
+
+Our goal is to 'scrape' a website page (or pages) and make some portion of its contents available in a tidy (JSON) format at an address (an 'endpoint') - this is our API. Other developers that wanted to use the information from the site we scraped can now access the data in a very predictable tidy way from our API
+
+You can see an example of Spotify's API endpoints [here](https://developer.spotify.com/web-api/endpoint-reference/)
+
+The best APIs have great documentation and often have a simple but compelling launch page. In Unit 10 you will build the launch page for your API. In Unit 11, you will make sure other developers using your API have to login first so they don't use it execssively (known as authentication) and in Unit 12 you will set up the database to store user account information for your API users.
+
+A user should be able to make a GET request to one of your routes (endpoints), and your server should respond with the data you scraped.
 
 ---
 
-In this challenge, we're going to be scraping an external site, parsing their html, converting it into JSON and returning that JSON data.
+## Learning Goals
 
-# Web scraping
-Web scraping is making an HTML request, and pulling out data from the response. We web scrape all the time with our eyes we just don't know that we're doing it
-We go to a web page and parse it to extract the data that is relevant to us.
+* Learning what a server is and does
+* Understand what an API is and how to build one
+* Learn how to find the data you need and properly scrape a website
+* Understand the importance of good documentation to encourage developers to use your API
 
-> How Can Mirrors Be Real If Our Eyes Aren't Real - Jaden Smith
+## Things to look out for
 
-We are going to use a module called [cheerio](https://github.com/cheeriojs/cheerio) to help us do this. Cheerio allows developers to interact with pages on the server similar to the way they interact with the DOM using jQuery. There are tons of great guides out there to help you figure it out, their docs are very helpful as well.
+* As you scrape, you should consider that the DOM does not always load all at once and may use JavaScript to populate its content
+* Investigate the http status code of the response you get when scrape a site - 200 is a success, others might require more thought [List of HTTP status codes](https://en.wikipedia.org/wiki/List_of_HTTP_status_codes)
+* You should expect to spend a lot of time closely reading the [node documentation](https://nodejs.org/api/) directly but balance this by looking at others' notes on how to navigate Node e.g. [Scraping with node](http://maxogden.com/scraping-with-node.html)
+
+---
+
+In this challenge, we're going to be scraping an external site, parsing their html, converting it into JSON and making that JSON data available at an 'endpoint' (a route)
+
+We are going to use a module in node called [cheerio](https://github.com/cheeriojs/cheerio) to help us do this. Node gives us access to lots of free pre-written code for us (packages) through a service known as [npm](http://npmjs.com). We can install these packages for our project [Installing npm packages locally](https://docs.npmjs.com/getting-started/installing-npm-packages-locally)
+
+[Cheerio](https://github.com/cheeriojs/cheerio) is an npm packages that allows developers to interact with pages on the server similar to the way they interact with the DOM using jQuery
 
 ##Getting started
 
 - Set Up
   - [ ] Figure out with your partner what site you want to scrape/what data you want to return.
   - [ ] Run npm install in your terminal to install external dependencies.
-- Basic API (use `npm test` to test your solutions for this section)
+- Basic API (use `npm test` to test your solutions for this section) You may also visit your route in your browser. The browser sends an http GET request to your route. Your server should respond.
   - [ ] Add a root route `/` to your Express server so that your server responds to requests to `http://localhost:3000/`
   - [ ] Configure your server to respond with Content-Type JSON for requests to the `/` route
   - [ ] Add at least two total endpoints to your server
@@ -63,14 +74,10 @@ We are going to use a module called [cheerio](https://github.com/cheeriojs/cheer
   * Examples: a GET request to /cats, /dogs, /people
 
 
-##How do I test if my answer is correct?
-There are two ways to test your code
-1. Visit your route in your browser. The browser sends an http GET request to your route. Your server should respond with the data you scraped.
-
-1. Run ```npm test``` in your terminal
-
-
-
-
-# Links and Resources
+# Additional Links and Resources
 <https://blog.hartleybrody.com/web-scraping/>
+<https://en.wikipedia.org/wiki/List_of_HTTP_status_codes>
+<http://maxogden.com/scraping-with-node.html>
+<http://www.smashingmagazine.com/2015/04/web-scraping-with-nodejs/>
+<http://encosia.com/cheerio-faster-windows-friendly-alternative-jsdom/>
+<https://nodejs.org/api/http.html>
