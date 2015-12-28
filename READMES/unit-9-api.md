@@ -48,23 +48,23 @@ We are going to use a module in node called [cheerio](https://github.com/cheerio
 ## Things to look out for
 
 * As you scrape, you should consider that the DOM does not always load all at once and may use JavaScript to populate its content
-* Investigate the http status code of the response you get when scrape a site - 200 is a success, others might require more thought [List of HTTP status codes](https://en.wikipedia.org/wiki/List_of_HTTP_status_codes)
+* Investigate the http status code of the response you get when scrape a site - 200 is a success, others might require more thought. [List of HTTP status codes](https://en.wikipedia.org/wiki/List_of_HTTP_status_codes)
 * You should expect to spend a lot of time closely reading the [node documentation](https://nodejs.org/api/) directly but balance this by looking at others' notes on how to navigate Node e.g. [Scraping with node](http://maxogden.com/scraping-with-node.html)
 
 ---
 
 ##Getting started
 
-#### Set Up ('installation' instructions)
+#### Set Up
 
-- [ ] Figure out with your partner what site you want to scrape/what data you want to return.
-- [ ] Run npm install in your terminal to install external dependencies.
+- [ ] Figure out with your partner what site you want to scrape and what data you want to return.
+- [ ] Run `npm install` in your terminal to install external dependencies.
 
 #### Basic API 
-Using `npm test` to test your solutions for this section You may also visit your route in your browser. The browser sends an http GET request to your route. Your server should respond.
+Use `npm test` to test your solutions for this section. You may also visit your route in your browser and test the results manually. When the browser sends an http GET request to your route, your server should respond.
 - [ ] Add a root route `/` to your Express server so that your server responds to requests to `http://localhost:3000/`
 - [ ] Configure your server to respond with Content-Type JSON for requests to the `/` route
-- [ ] Add at least two total endpoints to your server
+- [ ] Add a couple more endpoints of your choice to your server, so that it has at least two total routes
 - [ ] Allow [Cross-Origin-Resource-Sharing](http://enable-cors.org/) on your server in order to allow your API to respond to requests from anywhere, not just from your own computer
 
 #### Advanced API: Scraping
