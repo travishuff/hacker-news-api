@@ -1,16 +1,18 @@
-var cheerio = require('cheerio');
-var request = require('request');
+'use strict';
 
-var scrapeController = {
-  getData: function(req, res, next) {
+const cheerio = require('cheerio');
+const request = require('request');
+
+const scrapeController = {
+  getData: (req, res, next) => {
 
     // change URL to any site that you want
-    request('http://www.producthunt.com/', function(error, response, html) {
-        var $ = cheerio.load(html);
-        // add code here
+    request('http://www.producthunt.com/', (error, response, html) => {
+      let $ = cheerio.load(html);
+      // add code here
 
     });
   }
-}
+};
 
 module.exports = scrapeController;

@@ -1,6 +1,8 @@
-var express = require('express');
-var app = express();
-var scraperController = require('./scraper');
+'use strict';
+
+const express = require('express');
+const app = express();
+const scraperController = require('./scraper');
 
 // first sample route
 app.get('/sample', scraperController.getData)
