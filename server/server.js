@@ -5,7 +5,7 @@ const app = express();
 const scraperController = require('./scraper');
 
 // first sample route
-app.get('/sample', scraperController.getData)
+app.get('/sample', scraperController.getData);
 
 app.listen(3000);
 
