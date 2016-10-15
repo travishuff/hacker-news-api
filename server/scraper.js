@@ -9,15 +9,15 @@ const scraperController = {
     console.log('accepted request from scraper', res.statusCode);
 
     request('https://news.ycombinator.com/', (error, response, html) => {
-      let $ = cheerio.load(html);
+      const $ = cheerio.load(html);
       // add code here
 
-      let titleArr = [];
+      const titleArr = [];
       $('.storylink').each(function (title) {
         titleArr.push($(this).text());
       });
       
-      let linkArr = [];
+      const linkArr = [];
       $('.storylink').each(function (link) {
         linkArr.push($(this).attr('href'));
       });
@@ -45,7 +45,7 @@ const scraperController = {
       });
       dataArr = dataArr.slice(0, 10);
       
-      let data = JSON.stringify(dataArr);
+      const data = JSON.stringify(dataArr);
 
       res.set('Content-Type', 'application/JSON');
       res.send(data);
