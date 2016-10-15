@@ -25,32 +25,23 @@ const scraperController2 = {
       });
       linkArr = linkArr.slice(0, 5);
       // console.log(linkArr);
-
-      let p1 = new Promise(function(resolve, reject) {
-          request('http://www.imdb.com' + linkArr[0], (error, response, html) => {
-            let $ = cheerio.load(html);
-            if (error) reject(error);
-            resolve($('.credit_summary_item').first().find($('.itemprop')).text());
-          });
-        })
-      .then(function(result) {
-        let movie1 = {'title': titleArr[0].trim(), 'director': result};
-        console.log(movie1);
-      });
-      //      let p2 = new Promise(function(resolve, reject) {
-      //     request('http://www.imdb.com' + linkArr[1], (error, response, html) => {
-      //       let $ = cheerio.load(html);
-      //       if (error) reject(error);
-      //       resolve($('.credit_summary_item').first().find($('.itemprop')).text());
-      //     });
-      //   })
-      // .then(function(result) {
-      //   console.log(result);
-      // });
-
-
-      // res.set('Content-Type', 'application/JSON');
-
+      const data = [];
+      for (let i = 0; i < 5; i++) {
+        let promiseVar = new Promise(function(resolve, reject) {
+            request('http://www.imdb.com' + linkArr[i], (error, response, html) => {
+              let $ = cheerio.load(html);
+              if (error) reject(error);
+              resolve($('.credit_summary_item').first().find($('.itemprop')).text());
+            });
+          })
+        .then(function(result) {
+          data.push({'title': titleArr[i].trim(), 'director': result});
+          if (data.length === 5) {
+            res.set('Content-Type', 'application/JSON');
+            res.send(data);
+          }
+        });
+      } 
     });
   }
 };
