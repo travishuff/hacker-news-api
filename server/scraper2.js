@@ -16,14 +16,13 @@ const scraperController2 = {
         titleArr.push($(this).text());
       });
       titleArr = titleArr.slice(0, 5);
-      // console.log(titleArr);
 
       let linkArr = [];
       $('.title').each(function (link) {
         linkArr.push($(this).children().first().attr('href'));
       });
       linkArr = linkArr.slice(0, 5);
-      // console.log(linkArr);
+
       const data = [];
       const promiseArr = [];
       let promiseVar;
@@ -39,7 +38,9 @@ const scraperController2 = {
             data.push({'title': titleArr[i].trim(), 'director': result});
           });
           promiseArr.push(promiseVar);
-      } 
+      }
+      
+      // when all promises are in the array and finished => Promise.all
       Promise.all(promiseArr).then(() => {
             res.set('Content-Type', 'application/JSON');
             res.send(data);
@@ -49,22 +50,3 @@ const scraperController2 = {
 };
 
 module.exports = scraperController2;
-
-//  get 7 titles class="title" get test  , navigate to on down href attr
-//  navigate to their page and get first 2 stars class="actors" text
-//  for (let i = 0; i < 5; i++) {
-//         let promiseVar = new Promise(function(resolve, reject) {
-//             request('http://www.imdb.com' + linkArr[i], (error, response, html) => {
-//               let $ = cheerio.load(html);
-//               if (error) reject(error);
-//               resolve($('.credit_summary_item').first().find($('.itemprop')).text());
-//             });
-//           })
-//         .then(function(result) {
-//           data.push({'title': titleArr[i].trim(), 'director': result});
-//           if (data.length === 5) {
-//             res.set('Content-Type', 'application/JSON');
-//             res.send(data);
-//           }
-//         });
-//       } 

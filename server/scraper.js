@@ -10,7 +10,6 @@ const scraperController = {
 
     request('https://news.ycombinator.com/', (error, response, html) => {
       const $ = cheerio.load(html);
-      // add code here
 
       const titleArr = [];
       $('.storylink').each(function (title) {
@@ -30,6 +29,7 @@ const scraperController = {
         if (num === '') return 0;
         return Number(num);
       });
+      
       let dataArr = [];
       for (let i = 0; i < 30; i++) {
         dataArr.push(
