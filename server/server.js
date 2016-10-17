@@ -13,7 +13,7 @@ app.use((req, res, next) => {
   next();
 });
 
-app.get('/', scraperController.getData);
+app.get('/', cache('5 minutes'), scraperController.getData);
 
 app.get('/scraper2', cache('5 minutes'), scraperController2.getData);
 

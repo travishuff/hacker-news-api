@@ -6,9 +6,11 @@ const scraperController2 = require('./scraper2');
 
 const scraperController = {
   getData: (req, res, next) => {
-    console.log('accepted request from scraper', res.statusCode);
+    console.log('accepted request from scraper: ', res.statusCode);
 
     request('https://news.ycombinator.com/', (error, response, html) => {
+      if (error) console.error(error);
+      
       const $ = cheerio.load(html);
 
       const titleArr = [];
@@ -49,6 +51,8 @@ const scraperController = {
 
       res.set('Content-Type', 'application/JSON');
       res.send(data);
+      
+      //  where do I put 'next();' command?
     });
   }
 };
