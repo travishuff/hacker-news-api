@@ -1,5 +1,5 @@
 {
-  "name": "unit-9-node-api",
+  "name": "hacker-news-api",
   "version": "1.0.0",
   "description": "",
   "main": "index.js",
@@ -7,7 +7,7 @@
     "start": "node server/server.js",
     "test": "node_modules/.bin/mocha --timeout 10000 test/index.js"
   },
-  "author": "",
+  "author": "Travis Huff",
   "license": "ISC",
   "dependencies": {
     "apicache": "^0.2.3",

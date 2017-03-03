@@ -18,6 +18,6 @@ app.get('/', cache('5 minutes'), scraperController.getData);
 
 app.get('/scraper2', cache('5 minutes'), scraperController2.getData);
 
-app.listen(3000);
+app.listen(process.env.PORT || 3000);
 
 module.exports = app;
