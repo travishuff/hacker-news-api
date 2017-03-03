@@ -1,55 +1,61 @@
-'use strict';
-
 const cheerio = require('cheerio');
 const request = require('request');
-const scraperController = require('./scraper');
 
+// get movies w/ director opening this week
 const scraperController2 = {
   getData: (req, res, next) => {
-    console.log('accepted request from scraper2: ', res.statusCode);
+    console.log('accepted request from scraper2.', 'status:', res.statusCode);
 
     request('http://www.imdb.com/', (error, response, html) => {
       if (error) console.error(error);
 
       const $ = cheerio.load(html);
-      
+
       let titleArr = [];
       $('.title').each( function(title) {
         titleArr.push($(this).text());
       });
-      titleArr = titleArr.slice(0, 5);
 
       let linkArr = [];
       $('.title').each(function (link) {
         linkArr.push($(this).children().first().attr('href'));
       });
-      linkArr = linkArr.slice(0, 5);
 
       const data = [];
       const promiseArr = [];
       let promiseVar;
-      for (let i = 0; i < 5; i++) {
+
+      // set number of articles by looping i times below
+      for (let i = 0; i < 10; i++) {
         promiseVar = new Promise((resolve, reject) => {
-            request('http://www.imdb.com' + linkArr[i], (error, response, html) => {
-              const $ = cheerio.load(html);
-              if (error) reject(error);
-              resolve(
-                $('.credit_summary_item').first().find($('.itemprop')).text());
-            });
-          }).then((result) => {
-            data.push({'title': titleArr[i].trim(), 'director': result});
+          request('http://www.imdb.com' + linkArr[i], (error, response, html) => {
+            if (error) {
+              reject(Error(res.statusCode));
+            }
+            const $ = cheerio.load(html);
+            resolve($('.credit_summary_item').first().find($('.itemprop')).text());
           });
-          promiseArr.push(promiseVar);
+        })
+        .then((result) => {
+          data.push({'title': titleArr[i].trim(), 'director': result});
+        });
+
+        // might not need this catch as it's handled by promise.all
+        // .catch((error) => {
+        //   console.error('Error resolving promise:', error.message);
+        // });
+
+        promiseArr.push(promiseVar);
       }
-      
+
       // when all promises are in the array and finished => Promise.all
-      Promise.all(promiseArr).then(() => {
-            res.set('Content-Type', 'application/JSON');
-            res.send(data);
-      });
+      Promise.all(promiseArr)
+        .then(() => {
+          res.set('Content-Type', 'application/JSON');
+          res.send(data);
+        })
+        .catch(error => console.error('Error with one of the promises:', error.message));
     });
-    
-    //  where do I put 'next();' command?
   }
 };
 
