@@ -30,7 +30,7 @@ const scraperController2 = {
         promiseVar = new Promise((resolve, reject) => {
           request('http://www.imdb.com' + linkArr[i], (error, response, html) => {
             if (error) {
-              reject(Error(res.statusCode));
+              reject(new Error(res.statusCode));
             }
             const $ = cheerio.load(html);
             resolve($('.credit_summary_item').first().find($('.itemprop')).text());
