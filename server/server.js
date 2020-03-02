@@ -13,7 +13,6 @@ app.use((req, res, next) => {
 });
 
 // middleware for caching in each individual route
-
 app.get('/', cache('5 minutes'), scraperController.getData);
 
 app.get('/scraper2', cache('5 minutes'), scraperController2.getData);

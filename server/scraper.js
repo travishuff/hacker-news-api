@@ -15,7 +15,7 @@ const scraperController = {
       $('.storylink').each(function (title) {
         titleArr.push($(this).text());
       });
-      
+
       const linkArr = [];
       $('.storylink').each(function (link) {
         linkArr.push($(this).attr('href'));
@@ -30,13 +30,21 @@ const scraperController = {
         return Number(num);
       });
 
+      let commentLinkArr = [];
+      $('.subtext').each(function (comment) {
+        let commentLink = ($(this).children().last().attr('href'));
+        commentLink = 'https://news.ycombinator.com/' + commentLink;
+        commentLinkArr.push(commentLink);
+      });
+
       let dataArr = [];
       for (let i = 0; i < 30; i++) {
         dataArr.push(
           {
             'title': titleArr[i],
             'link': linkArr[i],
-            'comment': commentArr[i]
+            'comments': commentArr[i],
+            'comments_link': commentLinkArr[i]
           }
         )
       }
