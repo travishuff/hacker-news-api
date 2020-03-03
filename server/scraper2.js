@@ -38,12 +38,10 @@ const scraperController2 = {
         })
         .then((result) => {
           data.push({'title': titleArr[i].trim(), 'director': result});
+        })
+        .catch((error) => {
+          console.error('Error resolving promise:', error.message);
         });
-
-        // might not need this catch as it's handled by promise.all
-        // .catch((error) => {
-        //   console.error('Error resolving promise:', error.message);
-        // });
 
         promiseArr.push(promiseVar);
       }

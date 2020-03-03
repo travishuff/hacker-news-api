@@ -1,7 +1,7 @@
 const cheerio = require('cheerio');
 const request = require('request');
 
-// get top 30 most commented Hacker News articles
+/* Get top 30 most commented Hacker News articles */
 const scraperController = {
   getData: (req, res, next) => {
     console.log('accepted request from scraper.', 'status:', res.statusCode);
@@ -52,20 +52,15 @@ const scraperController = {
         return b.comment - a.comment;
       });
 
-      // set number of articles here
+      /* Limit number of articles here, if necessary */
       // dataArr = dataArr.slice(0, 10);
 
       res.set('Content-Type', 'application/JSON');
       res.send(JSON.stringify(dataArr));
 
-      // no need to use next() since this is the last middleware in the chain
+      /* no need to use next() since this is the last middleware in the chain */
     });
   }
 };
 
 module.exports = scraperController;
-
-// TOP class = "athing"
-// title: class="title" + class="storylink" get the text
-// storylink: class="storylink" atr="href" get the href attribute
-// comments: class="subtext" lastChild parse to "&nnbsp" then convert to number
