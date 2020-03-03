@@ -3,13 +3,12 @@ const app = require('./../server/server');
 const request = require('supertest')(app);
 const routes = app._router.stack;
 
-let router_counter = 0;
-
-for (let i = 0; i < routes.length; i++) {
-  if (routes[i].route) {
-    router_counter++;
+const numRoutes = routes.reduce((all, item) => {
+  if (item.route) {
+    all++;
   }
-}
+  return all;
+}, 0);
 
 describe('Unit 9 Node API', () => {
   it('should connect to api', (done) => {
@@ -28,7 +27,7 @@ describe('Unit 9 Node API', () => {
   });
 
   it('should have at least two end points', () => {
-    expect(router_counter).to.be.at.least(2);
+    expect(numRoutes).to.be.at.least(2);
   });
 
   it('should allows cross origin resource sharing (look up Access-Control-Allow-Origin)', (done) => {
