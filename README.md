@@ -42,6 +42,17 @@ Returns IMDb titles and director names.
 Query params:
 - `limit` (number, optional): number of items to return (default `10`).
 
+## API Usage
+After starting the server (`npm start`), open these URLs in your web browser:
+
+- `http://localhost:3000/` — Returns Hacker News stories sorted by comment count, with title, link, comment count, and a comments link.
+- `http://localhost:3000/scraper2` — Returns IMDb titles with the director’s name.
+
+To limit the number of results, add the `limit` query parameter:
+
+- `http://localhost:3000/?limit=10`
+- `http://localhost:3000/scraper2?limit=5`
+
 ## Testing Notes
 - Integration tests stub outbound HTTP requests.
 - To avoid cache timers hanging tests, the suite sets `DISABLE_CACHE=true`.
