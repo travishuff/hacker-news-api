@@ -2,27 +2,40 @@
   "name": "hacker-news-api",
   "version": "1.0.0",
   "description": "",
-  "main": "index.js",
+  "main": "dist/server/server.js",
   "scripts": {
-    "start": "node server/server.js",
-    "test": "node_modules/.bin/mocha --timeout 10000 test/index.js"
+    "build": "tsc -p tsconfig.json",
+    "prestart": "npm run build",
+    "start": "node dist/server/server.js",
+    "test": "TS_NODE_TRANSPILE_ONLY=1 mocha -r ts-node/register --timeout 10000 \"test/**/*.test.ts\"",
+    "lint": "eslint \"server/**/*.ts\" \"test/**/*.ts\"",
+    "typecheck": "tsc -p tsconfig.json --noEmit"
   },
   "author": "Travis Huff",
   "license": "ISC",
+  "engines": {
+    "node": ">=25.8.1"
+  },
   "dependencies": {
-    "apicache": "^1.5.3",
-    "chai": "^4.2.0",
-    "cheerio": "^0.22.0",
-    "express": "^4.17.1",
-    "mocha": "^7.1.0",
-    "request": "^2.88.2",
-    "supertest": "^4.0.2"
+    "apicache": "^1.6.3",
+    "cheerio": "^1.2.0",
+    "express": "^5.2.1"
   },
   "devDependencies": {
-    "eslint": "^6.8.0",
-    "eslint-config-airbnb": "^18.0.1",
-    "eslint-plugin-import": "^2.20.1",
-    "eslint-plugin-jsx-a11y": "^6.2.3",
-    "eslint-plugin-react": "^7.18.3"
+    "@types/apicache": "^1.6.7",
+    "@types/chai": "^4.3.11",
+    "@types/express": "^5.0.3",
+    "@types/mocha": "^10.0.10",
+    "@types/node": "^22.13.5",
+    "@typescript-eslint/eslint-plugin": "^8.57.0",
+    "@typescript-eslint/parser": "^8.57.0",
+    "chai": "^6.2.2",
+    "eslint": "^9.0.0",
+    "eslint-plugin-import": "^2.32.0",
+    "globals": "^15.0.0",
+    "mocha": "^11.7.5",
+    "node-mocks-http": "^1.17.2",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.8.2"
   }
 }
