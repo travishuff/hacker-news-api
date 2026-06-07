@@ -1,7 +1,7 @@
 import { expect } from 'chai';
 
 import { parseHackerNewsHtml } from '../../server/scraper';
-import { parseImdbHomeHtml, parseImdbTitleHtml } from '../../server/scraper2';
+import { parseImdbGraphqlTitles } from '../../server/scraper2';
 
 describe('Scraper parsers (unit)', () => {
   it('parses and sorts Hacker News items by comment count', () => {
@@ -26,29 +26,47 @@ describe('Scraper parsers (unit)', () => {
     expect(data[0].comments_link).to.equal('https://news.ycombinator.com/item?id=1');
   });
 
-  it('parses IMDb homepage titles and links', () => {
-    const html = `
-      <html><body>
-        <div class="title"><a href="/title/tt001/">Movie One</a></div>
-        <div class="title"><a href="/title/tt002/">Movie Two</a></div>
-      </body></html>
-    `;
+  it('parses IMDb GraphQL MOVIEmeter titles and directors', () => {
+    const payload = {
+      data: {
+        topMeterTitles: {
+          edges: [
+            {
+              node: {
+                titleText: { text: 'Movie One' },
+                principalCredits: [
+                  {
+                    category: { text: 'Director' },
+                    credits: [
+                      { name: { nameText: { text: 'Jane Doe' } } },
+                      { name: { nameText: { text: 'John Smith' } } },
+                      { name: { nameText: { text: 'Jane Doe' } } },
+                    ],
+                  },
+                  {
+                    category: { text: 'Writer' },
+                    credits: [
+                      { name: { nameText: { text: 'Not The Director' } } },
+                    ],
+                  },
+                ],
+              },
+            },
+            {
+              node: {
+                titleText: { text: 'Movie Two' },
+                principalCredits: [],
+              },
+            },
+          ],
+        },
+      },
+    };
 
-    const titles = parseImdbHomeHtml(html, { limit: 2 });
+    const titles = parseImdbGraphqlTitles(payload);
     expect(titles).to.deep.equal([
-      { title: 'Movie One', link: 'https://www.imdb.com/title/tt001/' },
-      { title: 'Movie Two', link: 'https://www.imdb.com/title/tt002/' },
+      { title: 'Movie One', director: 'Jane Doe, John Smith' },
+      { title: 'Movie Two', director: 'Unknown' },
     ]);
-  });
-
-  it('parses IMDb title pages for director credit', () => {
-    const html = `
-      <html><body>
-        <div class="credit_summary_item"><a class="itemprop">Jane Doe</a></div>
-      </body></html>
-    `;
-
-    const director = parseImdbTitleHtml(html);
-    expect(director).to.equal('Jane Doe');
   });
 });

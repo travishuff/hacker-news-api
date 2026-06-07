@@ -1,10 +1,10 @@
 # Hacker News API (TypeScript)
 
-An Express API that scrapes Hacker News and IMDb, returning lightweight JSON data for demos and learning.
+An Express API that scrapes Hacker News and queries IMDb, returning lightweight JSON data for demos and learning.
 
 ## Features
 - `GET /` returns Hacker News stories sorted by comment count.
-- `GET /scraper2` returns IMDb titles with director credits.
+- `GET /scraper2` returns popular IMDb movie titles with director credits from IMDb's cached GraphQL data.
 - Built with TypeScript and an automated CI workflow.
 
 ## Requirements
@@ -38,12 +38,12 @@ Query params:
 - `limit` (number, optional): number of items to return (default `30`).
 
 ### `GET /scraper2`
-Returns IMDb titles and director names.  
+Returns popular IMDb movie titles from IMDb's MOVIEmeter chart and director names via IMDb's cached GraphQL endpoint.  
 Query params:
 - `limit` (number, optional): number of items to return (default `10`).
 
 ## Testing Notes
-- Integration tests stub outbound HTTP requests.
+- Integration tests stub outbound HTTP and IMDb GraphQL requests.
 - To avoid cache timers hanging tests, the suite sets `DISABLE_CACHE=true`.
 
 ## CI
