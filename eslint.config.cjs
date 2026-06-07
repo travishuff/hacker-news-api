@@ -34,13 +34,7 @@ module.exports = [
   },
   {
     files: ['test/**/*.test.ts'],
-    languageOptions: {
-      globals: {
-        ...globals.mocha,
-      },
-    },
     rules: {
-      '@typescript-eslint/no-unused-expressions': 'off',
       'no-underscore-dangle': 'off',
       'import/no-extraneous-dependencies': 'off',
     },

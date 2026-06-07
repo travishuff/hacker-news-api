@@ -1,7 +1,7 @@
 process.env.DISABLE_CACHE = 'true';
 
+import { afterEach, describe, expect, it, spyOn } from 'bun:test';
 import { EventEmitter } from 'events';
-import { expect } from 'chai';
 import httpMocks from 'node-mocks-http';
 
 import app from '../../server/server';
@@ -59,17 +59,17 @@ describe('API routes (integration)', () => {
       headers: { Accept: 'application/json' },
     });
 
-    expect(response._getStatusCode()).to.equal(200);
-    expect(response._getHeaders()['access-control-allow-origin']).to.equal('*');
+    expect(response._getStatusCode()).toBe(200);
+    expect(response._getHeaders()['access-control-allow-origin']).toBe('*');
     const body = JSON.parse(response._getData());
-    expect(body).to.have.lengthOf(2);
-    expect(body[0]).to.include({ title: 'Story B', comments: 12 });
-    expect(body[1]).to.include({ title: 'Story A', comments: 3 });
+    expect(body).toHaveLength(2);
+    expect(body[0]).toMatchObject({ title: 'Story B', comments: 12 });
+    expect(body[1]).toMatchObject({ title: 'Story A', comments: 3 });
   });
 
   it('GET /scraper2 returns IMDb data', async () => {
     app.locals.fetchImdbGraphql = async (_query, variables) => {
-      expect(variables).to.deep.equal({ limit: 2 });
+      expect(variables).toEqual({ limit: 2 });
       return {
         data: {
           topMeterTitles: {
@@ -112,9 +112,9 @@ describe('API routes (integration)', () => {
       headers: { Accept: 'application/json' },
     });
 
-    expect(response._getStatusCode()).to.equal(200);
+    expect(response._getStatusCode()).toBe(200);
     const body = JSON.parse(response._getData());
-    expect(body).to.deep.equal([
+    expect(body).toEqual([
       { title: 'Movie One', director: 'Jane Doe' },
       { title: 'Movie Two', director: 'John Smith' },
     ]);
@@ -140,25 +140,30 @@ describe('API routes (integration)', () => {
       headers: { Accept: 'application/json' },
     });
 
-    expect(response._getStatusCode()).to.equal(200);
+    expect(response._getStatusCode()).toBe(200);
     const body = JSON.parse(response._getData());
-    expect(body).to.have.lengthOf(10);
-    expect(body[0]).to.deep.equal({ title: 'Movie 1', director: 'Unknown' });
+    expect(body).toHaveLength(10);
+    expect(body[0]).toEqual({ title: 'Movie 1', director: 'Unknown' });
   });
 
   it('returns 500 when upstream fetch fails', async () => {
+    const consoleError = spyOn(console, 'error').mockImplementation(() => {});
     app.locals.fetchHtml = async () => {
       throw new Error('Upstream unavailable');
     };
 
-    const response = await makeRequest({
-      method: 'GET',
-      url: '/',
-      headers: { Accept: 'application/json' },
-    });
+    try {
+      const response = await makeRequest({
+        method: 'GET',
+        url: '/',
+        headers: { Accept: 'application/json' },
+      });
 
-    expect(response._getStatusCode()).to.equal(500);
-    const body = JSON.parse(response._getData());
-    expect(body).to.deep.equal({ error: 'Internal Server Error' });
+      expect(response._getStatusCode()).toBe(500);
+      const body = JSON.parse(response._getData());
+      expect(body).toEqual({ error: 'Internal Server Error' });
+    } finally {
+      consoleError.mockRestore();
+    }
   });
 });

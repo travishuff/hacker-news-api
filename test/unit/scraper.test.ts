@@ -1,4 +1,4 @@
-import { expect } from 'chai';
+import { describe, expect, it } from 'bun:test';
 
 import { parseHackerNewsHtml } from '../../server/scraper';
 import { parseImdbGraphqlTitles } from '../../server/scraper2';
@@ -19,11 +19,11 @@ describe('Scraper parsers (unit)', () => {
     `;
 
     const data = parseHackerNewsHtml(html, { limit: 3 });
-    expect(data).to.have.lengthOf(3);
-    expect(data[0]).to.include({ title: 'Story A', comments: 42 });
-    expect(data[1]).to.include({ title: 'Story C', comments: 1 });
-    expect(data[2]).to.include({ title: 'Story B', comments: 0 });
-    expect(data[0].comments_link).to.equal('https://news.ycombinator.com/item?id=1');
+    expect(data).toHaveLength(3);
+    expect(data[0]).toMatchObject({ title: 'Story A', comments: 42 });
+    expect(data[1]).toMatchObject({ title: 'Story C', comments: 1 });
+    expect(data[2]).toMatchObject({ title: 'Story B', comments: 0 });
+    expect(data[0].comments_link).toBe('https://news.ycombinator.com/item?id=1');
   });
 
   it('parses IMDb GraphQL MOVIEmeter titles and directors', () => {
@@ -64,7 +64,7 @@ describe('Scraper parsers (unit)', () => {
     };
 
     const titles = parseImdbGraphqlTitles(payload);
-    expect(titles).to.deep.equal([
+    expect(titles).toEqual([
       { title: 'Movie One', director: 'Jane Doe, John Smith' },
       { title: 'Movie Two', director: 'Unknown' },
     ]);

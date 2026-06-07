@@ -8,25 +8,24 @@ An Express API that scrapes Hacker News and queries IMDb, returning lightweight 
 - Built with TypeScript and an automated CI workflow.
 
 ## Requirements
-- Node `>= 25.8.1` (see `.nvmrc`).
-- npm `>= 11`.
+- Bun `>= 1.3.14`.
 
 ## Setup
 ```bash
-npm install
+bun install
 ```
 
 ## Development
 ```bash
-npm test
-npm run lint
-npm run typecheck
+bun test
+bun run lint
+bun run typecheck
 ```
 
 ## Build And Run
 ```bash
-npm run build
-npm start
+bun run build
+bun run start
 ```
 
 The server listens on `PORT` (default `3000`).
