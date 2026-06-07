@@ -1,7 +1,7 @@
-import { expect } from 'chai';
+import { describe, expect, it } from 'bun:test';
 
 import { parseHackerNewsHtml } from '../../server/scraper';
-import { parseImdbHomeHtml, parseImdbTitleHtml } from '../../server/scraper2';
+import { parseImdbGraphqlTitles } from '../../server/scraper2';
 
 describe('Scraper parsers (unit)', () => {
   it('parses and sorts Hacker News items by comment count', () => {
@@ -19,36 +19,54 @@ describe('Scraper parsers (unit)', () => {
     `;
 
     const data = parseHackerNewsHtml(html, { limit: 3 });
-    expect(data).to.have.lengthOf(3);
-    expect(data[0]).to.include({ title: 'Story A', comments: 42 });
-    expect(data[1]).to.include({ title: 'Story C', comments: 1 });
-    expect(data[2]).to.include({ title: 'Story B', comments: 0 });
-    expect(data[0].comments_link).to.equal('https://news.ycombinator.com/item?id=1');
+    expect(data).toHaveLength(3);
+    expect(data[0]).toMatchObject({ title: 'Story A', comments: 42 });
+    expect(data[1]).toMatchObject({ title: 'Story C', comments: 1 });
+    expect(data[2]).toMatchObject({ title: 'Story B', comments: 0 });
+    expect(data[0].comments_link).toBe('https://news.ycombinator.com/item?id=1');
   });
 
-  it('parses IMDb homepage titles and links', () => {
-    const html = `
-      <html><body>
-        <div class="title"><a href="/title/tt001/">Movie One</a></div>
-        <div class="title"><a href="/title/tt002/">Movie Two</a></div>
-      </body></html>
-    `;
+  it('parses IMDb GraphQL MOVIEmeter titles and directors', () => {
+    const payload = {
+      data: {
+        topMeterTitles: {
+          edges: [
+            {
+              node: {
+                titleText: { text: 'Movie One' },
+                principalCredits: [
+                  {
+                    category: { text: 'Director' },
+                    credits: [
+                      { name: { nameText: { text: 'Jane Doe' } } },
+                      { name: { nameText: { text: 'John Smith' } } },
+                      { name: { nameText: { text: 'Jane Doe' } } },
+                    ],
+                  },
+                  {
+                    category: { text: 'Writer' },
+                    credits: [
+                      { name: { nameText: { text: 'Not The Director' } } },
+                    ],
+                  },
+                ],
+              },
+            },
+            {
+              node: {
+                titleText: { text: 'Movie Two' },
+                principalCredits: [],
+              },
+            },
+          ],
+        },
+      },
+    };
 
-    const titles = parseImdbHomeHtml(html, { limit: 2 });
-    expect(titles).to.deep.equal([
-      { title: 'Movie One', link: 'https://www.imdb.com/title/tt001/' },
-      { title: 'Movie Two', link: 'https://www.imdb.com/title/tt002/' },
+    const titles = parseImdbGraphqlTitles(payload);
+    expect(titles).toEqual([
+      { title: 'Movie One', director: 'Jane Doe, John Smith' },
+      { title: 'Movie Two', director: 'Unknown' },
     ]);
-  });
-
-  it('parses IMDb title pages for director credit', () => {
-    const html = `
-      <html><body>
-        <div class="credit_summary_item"><a class="itemprop">Jane Doe</a></div>
-      </body></html>
-    `;
-
-    const director = parseImdbTitleHtml(html);
-    expect(director).to.equal('Jane Doe');
   });
 });

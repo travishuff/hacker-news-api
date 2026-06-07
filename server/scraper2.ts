@@ -1,91 +1,136 @@
 import type { NextFunction, Request, Response } from 'express';
-import * as cheerio from 'cheerio';
-import { fetchHtml } from './http';
 
-const IMDB_URL = 'https://www.imdb.com/';
-const IMDB_BASE = 'https://www.imdb.com';
-
-const normalizeImdbUrl = (url: string | undefined): string => {
-  if (!url) {
-    return '';
-  }
-  if (url.startsWith('http://') || url.startsWith('https://')) {
-    return url;
-  }
-  if (url.startsWith('/')) {
-    return `${IMDB_BASE}${url}`;
-  }
-  return `${IMDB_BASE}/${url}`;
-};
-
-type ImdbTitle = {
-  title: string;
-  link: string;
-};
-
-type ParseOptions = {
-  limit?: number;
-};
-
-export const parseImdbHomeHtml = (
-  html: string,
-  { limit = 10 }: ParseOptions = {},
-): ImdbTitle[] => {
-  const $ = cheerio.load(html);
-  const candidates: ImdbTitle[] = [];
-
-  $('.title a, a.title, .ipc-title-link-wrapper').each(function collectImdbTitle() {
-    const title = $(this).text().trim();
-    const link = $(this).attr('href');
-    if (title && link) {
-      candidates.push({ title, link: normalizeImdbUrl(link) });
+const IMDB_GRAPHQL_URL = 'https://caching.graphql.imdb.com/';
+const IMDB_GRAPHQL_TOP_METER_QUERY = `
+  query Scraper2TopMeterTitles($limit: Int!) {
+    topMeterTitles(first: $limit, filter: { topMeterTitlesType: MOVIE }) {
+      edges {
+        node {
+          titleText {
+            text
+          }
+          principalCredits {
+            category {
+              text
+            }
+            credits {
+              name {
+                nameText {
+                  text
+                }
+              }
+            }
+          }
+        }
+      }
     }
+  }
+`;
+
+type ImdbMovie = {
+  title: string;
+  director: string;
+};
+
+type GraphqlFetcher = (query: string, variables: Record<string, unknown>) => Promise<unknown>;
+type JsonRecord = Record<string, unknown>;
+type UpstreamError = Error & { status?: number };
+
+const normalizeText = (text: string): string => text.replace(/\s+/g, ' ').trim();
+
+const isRecord = (value: unknown): value is JsonRecord => (
+  typeof value === 'object' && value !== null && !Array.isArray(value)
+);
+
+const asString = (value: unknown): string => (typeof value === 'string' ? value : '');
+
+const getGraphqlDirector = (node: JsonRecord): string => {
+  const principalCredits = Array.isArray(node.principalCredits) ? node.principalCredits : [];
+  const directorCredit = principalCredits.find((credit) => {
+    if (!isRecord(credit) || !isRecord(credit.category)) {
+      return false;
+    }
+
+    return /^Directors?$/i.test(asString(credit.category.text));
   });
 
-  return candidates.slice(0, limit);
-};
-
-export const parseImdbTitleHtml = (html: string): string => {
-  const $ = cheerio.load(html);
-  const credit = $('.credit_summary_item')
-    .first()
-    .find('.itemprop')
-    .text()
-    .trim();
-  if (credit) {
-    return credit;
+  if (!isRecord(directorCredit) || !Array.isArray(directorCredit.credits)) {
+    return 'Unknown';
   }
 
-  const dataTestId = $('[data-testid="title-pc-principal-credit"]').text().trim();
-  if (dataTestId) {
-    return dataTestId;
-  }
+  const directors = directorCredit.credits
+    .map((credit) => {
+      if (!isRecord(credit) || !isRecord(credit.name) || !isRecord(credit.name.nameText)) {
+        return '';
+      }
 
-  return 'Unknown';
+      return normalizeText(asString(credit.name.nameText.text));
+    })
+    .filter(Boolean);
+
+  return [...new Set(directors)].join(', ') || 'Unknown';
 };
 
-// get movies w/ director opening this week
+export const parseImdbGraphqlTitles = (payload: unknown): ImdbMovie[] => {
+  if (!isRecord(payload) || !isRecord(payload.data) || !isRecord(payload.data.topMeterTitles)) {
+    return [];
+  }
+
+  const edges = payload.data.topMeterTitles.edges;
+  if (!Array.isArray(edges)) {
+    return [];
+  }
+
+  return edges.flatMap((edge) => {
+    if (!isRecord(edge) || !isRecord(edge.node) || !isRecord(edge.node.titleText)) {
+      return [];
+    }
+
+    const title = normalizeText(asString(edge.node.titleText.text));
+    if (!title) {
+      return [];
+    }
+
+    return [{ title, director: getGraphqlDirector(edge.node) }];
+  });
+};
+
+const fetchImdbGraphql: GraphqlFetcher = async (query, variables) => {
+  const response = await fetch(IMDB_GRAPHQL_URL, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      Accept: 'application/json',
+    },
+    body: JSON.stringify({ query, variables }),
+  });
+
+  if (!response.ok) {
+    const error = new Error(`IMDb GraphQL request failed with status ${response.status}`) as UpstreamError;
+    error.status = response.status;
+    throw error;
+  }
+
+  return response.json() as Promise<unknown>;
+};
+
+const getLimit = (req: Request): number => {
+  const rawLimit = Array.isArray(req.query.limit) ? req.query.limit[0] : req.query.limit;
+  const limitParam = typeof rawLimit === 'string' ? rawLimit : undefined;
+  const limit = Number.parseInt(limitParam ?? '', 10);
+  return Number.isFinite(limit) && limit > 0 ? limit : 10;
+};
+
+// Get popular IMDb movies with director credits.
 const getData = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
   try {
     console.log('accepted request from scraper2.', 'status:', res.statusCode);
-    const fetcher = (req.app?.locals?.fetchHtml as typeof fetchHtml | undefined) || fetchHtml;
-    const rawLimit = Array.isArray(req.query.limit) ? req.query.limit[0] : req.query.limit;
-    const limitParam = typeof rawLimit === 'string' ? rawLimit : undefined;
-    const limit = Number.parseInt(limitParam ?? '', 10);
-    const maxItems = Number.isFinite(limit) && limit > 0 ? limit : 10;
+    const graphqlFetcher = (
+      req.app?.locals?.fetchImdbGraphql as GraphqlFetcher | undefined
+    ) || fetchImdbGraphql;
 
-    const homepageHtml = await fetcher(IMDB_URL);
-    const titles = parseImdbHomeHtml(homepageHtml, { limit: maxItems });
-
-    const data = await Promise.all(
-      titles.map(async (item) => {
-        const detailHtml = await fetcher(item.link);
-        const director = parseImdbTitleHtml(detailHtml);
-        return { title: item.title, director };
-      }),
-    );
-
-    res.json(data);
+    const payload = await graphqlFetcher(IMDB_GRAPHQL_TOP_METER_QUERY, { limit: getLimit(req) });
+    res.json(parseImdbGraphqlTitles(payload));
   } catch (error) {
     next(error);
   }

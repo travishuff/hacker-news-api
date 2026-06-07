@@ -1,1 +1,1 @@
-npm start
+web: bun run start

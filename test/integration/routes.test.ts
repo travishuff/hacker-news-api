@@ -1,13 +1,12 @@
 process.env.DISABLE_CACHE = 'true';
 
+import { afterEach, describe, expect, it, spyOn } from 'bun:test';
 import { EventEmitter } from 'events';
-import { expect } from 'chai';
 import httpMocks from 'node-mocks-http';
 
 import app from '../../server/server';
 
 const HN_URL = 'https://news.ycombinator.com/';
-const IMDB_URL = 'https://www.imdb.com/';
 
 type RequestOptions = {
   method: string;
@@ -32,6 +31,7 @@ describe('API routes (integration)', () => {
   };
   afterEach(() => {
     delete app.locals.fetchHtml;
+    delete app.locals.fetchImdbGraphql;
   });
 
   it('GET / returns sorted Hacker News data and CORS headers', async () => {
@@ -59,45 +59,51 @@ describe('API routes (integration)', () => {
       headers: { Accept: 'application/json' },
     });
 
-    expect(response._getStatusCode()).to.equal(200);
-    expect(response._getHeaders()['access-control-allow-origin']).to.equal('*');
+    expect(response._getStatusCode()).toBe(200);
+    expect(response._getHeaders()['access-control-allow-origin']).toBe('*');
     const body = JSON.parse(response._getData());
-    expect(body).to.have.lengthOf(2);
-    expect(body[0]).to.include({ title: 'Story B', comments: 12 });
-    expect(body[1]).to.include({ title: 'Story A', comments: 3 });
+    expect(body).toHaveLength(2);
+    expect(body[0]).toMatchObject({ title: 'Story B', comments: 12 });
+    expect(body[1]).toMatchObject({ title: 'Story A', comments: 3 });
   });
 
   it('GET /scraper2 returns IMDb data', async () => {
-    const imdbHomeHtml = `
-      <html><body>
-        <div class="title"><a href="/title/tt001/">Movie One</a></div>
-        <div class="title"><a href="/title/tt002/">Movie Two</a></div>
-      </body></html>
-    `;
-
-    const imdbMovie1Html = `
-      <html><body>
-        <div class="credit_summary_item"><a class="itemprop">Jane Doe</a></div>
-      </body></html>
-    `;
-
-    const imdbMovie2Html = `
-      <html><body>
-        <div class="credit_summary_item"><a class="itemprop">John Smith</a></div>
-      </body></html>
-    `;
-
-    const fixtures = new Map([
-      [IMDB_URL, imdbHomeHtml],
-      ['https://www.imdb.com/title/tt001/', imdbMovie1Html],
-      ['https://www.imdb.com/title/tt002/', imdbMovie2Html],
-    ]);
-
-    app.locals.fetchHtml = async (url) => {
-      if (fixtures.has(url)) {
-        return fixtures.get(url);
-      }
-      throw new Error(`Unexpected URL: ${url}`);
+    app.locals.fetchImdbGraphql = async (_query, variables) => {
+      expect(variables).toEqual({ limit: 2 });
+      return {
+        data: {
+          topMeterTitles: {
+            edges: [
+              {
+                node: {
+                  titleText: { text: 'Movie One' },
+                  principalCredits: [
+                    {
+                      category: { text: 'Director' },
+                      credits: [
+                        { name: { nameText: { text: 'Jane Doe' } } },
+                      ],
+                    },
+                  ],
+                },
+              },
+              {
+                node: {
+                  titleText: { text: 'Movie Two' },
+                  principalCredits: [
+                    {
+                      category: { text: 'Director' },
+                      credits: [
+                        { name: { nameText: { text: 'John Smith' } } },
+                      ],
+                    },
+                  ],
+                },
+              },
+            ],
+          },
+        },
+      };
     };
 
     const response = await makeRequest({
@@ -106,27 +112,58 @@ describe('API routes (integration)', () => {
       headers: { Accept: 'application/json' },
     });
 
-    expect(response._getStatusCode()).to.equal(200);
+    expect(response._getStatusCode()).toBe(200);
     const body = JSON.parse(response._getData());
-    expect(body).to.deep.equal([
+    expect(body).toEqual([
       { title: 'Movie One', director: 'Jane Doe' },
       { title: 'Movie Two', director: 'John Smith' },
     ]);
   });
 
+  it('GET /scraper2 defaults to 10 IMDb titles', async () => {
+    app.locals.fetchImdbGraphql = async () => ({
+      data: {
+        topMeterTitles: {
+          edges: Array.from({ length: 10 }, (_, index) => ({
+            node: {
+              titleText: { text: `Movie ${index + 1}` },
+              principalCredits: [],
+            },
+          })),
+        },
+      },
+    });
+
+    const response = await makeRequest({
+      method: 'GET',
+      url: '/scraper2',
+      headers: { Accept: 'application/json' },
+    });
+
+    expect(response._getStatusCode()).toBe(200);
+    const body = JSON.parse(response._getData());
+    expect(body).toHaveLength(10);
+    expect(body[0]).toEqual({ title: 'Movie 1', director: 'Unknown' });
+  });
+
   it('returns 500 when upstream fetch fails', async () => {
+    const consoleError = spyOn(console, 'error').mockImplementation(() => {});
     app.locals.fetchHtml = async () => {
       throw new Error('Upstream unavailable');
     };
 
-    const response = await makeRequest({
-      method: 'GET',
-      url: '/',
-      headers: { Accept: 'application/json' },
-    });
+    try {
+      const response = await makeRequest({
+        method: 'GET',
+        url: '/',
+        headers: { Accept: 'application/json' },
+      });
 
-    expect(response._getStatusCode()).to.equal(500);
-    const body = JSON.parse(response._getData());
-    expect(body).to.deep.equal({ error: 'Internal Server Error' });
+      expect(response._getStatusCode()).toBe(500);
+      const body = JSON.parse(response._getData());
+      expect(body).toEqual({ error: 'Internal Server Error' });
+    } finally {
+      consoleError.mockRestore();
+    }
   });
 });
